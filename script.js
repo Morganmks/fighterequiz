@@ -1084,17 +1084,24 @@ screens.chapter.addEventListener("click", (e) => { e.stopPropagation(); enterBri
 
 document.getElementById("email-form").addEventListener("submit", async (e) => {
   e.preventDefault();
+  const name = document.getElementById("name-input").value.trim();
   const email = document.getElementById("email-input").value;
   const submitBtn = e.target.querySelector("button");
   submitBtn.disabled = true;
   submitBtn.textContent = "Unlocking...";
   sfx.forward();
-  document.getElementById("email-input").blur(); // drop the mobile keyboard
+  document.activeElement?.blur(); // drop the mobile keyboard
+
+  // Remember locally too. This doesn't stop anyone determined — a new browser or
+  // incognito resets it — but it stops the honest case of someone replaying and
+  // re-submitting the same address. The server is what actually enforces it.
+  try { localStorage.setItem("longuard_fighter", finalArchetype); } catch (err) { /* private mode */ }
 
   const submission = fetch("/api/submit-quiz", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
+      name,
       email,
       archetype: RESULTS[finalArchetype].title,
       fitPreference,
@@ -1496,6 +1503,7 @@ document.getElementById("retake-btn").addEventListener("click", (e) => {
   document.body.classList.remove("in-mission");
   document.getElementById("result-body").classList.remove("revealed");
   document.getElementById("email-input").value = "";
+  document.getElementById("name-input").value = "";
   showScreen("title");
 });
 
