@@ -9,15 +9,16 @@ assets/
   hero/
     hero-desktop.jpg    ← STILL key art for the Press Start screen (760px+)
     hero-mobile.jpg     ← STILL key art for phones (portrait crop)
-    hero.mp4            ← video for the menu screen onward (landscape)
-    hero-mobile.mp4     ← optional portrait video cut, used under 760px
-    hero.webm           ← optional, smaller, Chrome/Firefox prefer it
+    hero.mp4            ← menu video, 760px and up
+    hero-mobile.mp4     ← menu video for phones (smaller + shorter)
+  audio/
+    select.mp3          ← the Press to Start sound
   fighters/
-    slasher.png         ← portrait art, one per archetype
-    stoic.png
-    joker.png
-    sleeper.png
-    slasher.mp4         ← optional looping portrait, used on the result screen
+    slasher.jpg         ← portrait art, one per archetype
+    stoic.jpg
+    joker.jpg
+    sleeper.jpg
+    slasher.mp4         ← optional looping portrait for the result screen
     stoic.mp4
     joker.mp4
     sleeper.mp4
@@ -38,27 +39,60 @@ original. Don't pre-darken or pre-texture the file; the page will over-darken it
 
 ## Hero video
 
-- **8–15 seconds, seamless loop.** It plays forever behind the title screen.
-- **No audio track.** Strip it — it saves weight and the video is muted anyway.
-- **Under ~3MB.** Most visitors arrive from Instagram on cellular.
-- **Graded dark, low contrast.** Type sits on top of it. Anything bright or busy
-  in the lower-left will fight the headline.
-- **Keep the subject in the right third** on the landscape cut. The left is where
-  the lockup lives.
-- Landscape `hero.mp4` gets center-cropped hard on a phone. If that loses the
-  shot, add `hero-mobile.mp4` as a 9:16 cut and it swaps automatically under
-  760px.
+Plays behind the menu from the moment someone presses start. **Currently shipped:**
 
-Export: H.264 MP4, 1920×1080 (landscape) / 1080×1920 (portrait), CRF ~24.
+| File | Size | Resolution | Length |
+|---|---|---|---|
+| `hero.mp4` | 13 MB | 1280×720 | 15s |
+| `hero-mobile.mp4` | 4.5 MB | 640×360 | 15s |
+
+Both carry their AAC audio track — **this is the only soundtrack**. The speaker
+toggle unmutes it. The Press to Start screen is a still, so there is deliberately
+no audio there beyond the click; sound begins when the menu video does.
+
+**Keep every file in this repo under 25 MB.** GitHub refuses any file over 100 MB
+outright and its web uploader stops at 25 MB, so a single oversized file blocks
+the entire push — which is exactly what a 121 MB source did once already. Master
+files live outside the project, in `~/Documents/Claude/longuard-video-sources/`.
+
+### Re-encoding from a master
+
+`avconvert` ships with macOS and needs no install. Its presets are fixed-quality
+with no bitrate control, so **length is the lever, not compression** — trimming
+keeps every frame at full quality, where dropping the bitrate would not.
+
+```
+cd ~/Documents/Claude/longuard-video-sources
+avconvert -s sm.quiz.hero.mp4 -p Preset1280x720 --duration 15 -o hero.mp4 --replace
+avconvert -s sm.quiz.hero.mp4 -p Preset640x480  --duration 15 -o hero-mobile.mp4 --replace
+```
+
+Roughly 0.9 MB per second at 720p and 0.3 MB per second at 360p, so a 20-second
+desktop cut lands near 18 MB. Other presets, measured on this footage at 15s:
+`Preset960x540` 8.8 MB, `PresetAppleM4VWiFi` 1.2 MB but only 480×272.
+
+If you install HandBrake you get real bitrate control and can hold 720p for the
+full 29 seconds at around 5 MB — RF 26, web-optimised, audio at 96 kbps.
+
+### Shooting for it
+
+- **Loop-friendly.** The cut from the last frame back to the first is visible;
+  start and end on similar framing.
+- **No bright action in the lower left** — the headline and menu sit there.
+- **Graded dark.** The page adds its own grade, vignette, grain and a left-side
+  fade to black on top.
 
 ## Fighter portraits
 
-- **3:4 portrait**, roughly 900×1200, PNG or JPG.
+- **3:4 portrait**, roughly 900×1200. JPG unless you need transparency —
+  the four shipped files are 1200px JPGs at 190–315 KB each.
+- The filename must match the archetype exactly: `slasher`, `stoic`, `joker`,
+  `sleeper`. A file named `slash.jpg` silently falls back to a placeholder.
 - Framed head-and-shoulders to mid-torso, subject centered.
-- **They need to read as a silhouette.** Before you get your result, each card
-  shows the art flattened to a flat dark shape — so a distinct outline (hood,
-  stance, shoulders) matters more than surface detail.
-- Keep backgrounds dark or transparent; the card sits on near-black.
+- **They get obscured before they're earned.** In the roster, locked cards are
+  grayscaled, darkened and blurred — you can sense a figure, not read a face — so
+  a strong overall shape (hood, stance, shoulders) matters more than fine detail.
+- Keep backgrounds dark; the card sits on near-black.
 
 ## Optional fighter video
 

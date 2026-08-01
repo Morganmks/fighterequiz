@@ -450,9 +450,11 @@ function requestHeroVideo() {
   if (videoRequested || reducedMotion) return;
   videoRequested = true;
 
+  // Only formats that actually ship — listing a .webm we don't have just buys a
+  // 404 on every page load before the browser falls through to the mp4.
   const sources = portrait
-    ? ["assets/hero/hero-mobile.mp4", "assets/hero/hero.webm", "assets/hero/hero.mp4"]
-    : ["assets/hero/hero.webm", "assets/hero/hero.mp4"];
+    ? ["assets/hero/hero-mobile.mp4", "assets/hero/hero.mp4"]
+    : ["assets/hero/hero.mp4"];
 
   sources.forEach((src) => {
     const el = document.createElement("source");
@@ -530,12 +532,12 @@ function haptic(pattern = 12) {
 
 // ===== Audio =====
 // Two independent channels, the way Hound Archives does it: the toggle governs
-// music (and the hero video's track) only. UI sounds are never muted — they're
+// the hero video's audio track only. UI sounds are never muted — they're
 // feedback, not ambience.
 //
-// Browsers won't let anything be audible before a gesture, so the theme starts
-// muted-but-playing on load and unmutes on the first interaction. That means it
-// is already in sync and audible from the moment someone presses start.
+// Browsers won't let anything be audible before a gesture, so the video starts
+// muted and unmutes on the first interaction. The attract screen is a still, so
+// there's deliberately no soundtrack until the menu.
 
 const audio = { music: true, volume: 0.5, ctx: null };
 
@@ -665,36 +667,13 @@ const sfx = {
 
 const audioBtn = document.getElementById("audio-btn");
 const audioRange = document.getElementById("audio-range");
-const theme = document.getElementById("theme");
-
-let themeMissing = false;
-theme.addEventListener("error", () => { themeMissing = true; });
-
-// Muted autoplay is always permitted, so the track is rolling from load and only
-// its mute state changes — no seek, no restart, no gap when it becomes audible.
-theme.muted = true;
-theme.volume = audio.volume * 0.55;
-(function primeTheme() {
-  const attempt = theme.play();
-  if (attempt && attempt.catch) attempt.catch(() => {});
-})();
-
 function applyAudio() {
   document.body.classList.toggle("audio-on", audio.music);
   audioBtn.setAttribute("aria-pressed", String(audio.music));
-  audioBtn.setAttribute("aria-label", audio.music ? "Mute music" : "Unmute music");
+  audioBtn.setAttribute("aria-label", audio.music ? "Mute" : "Unmute");
 
   heroVideo.muted = !audio.music;
   heroVideo.volume = audio.volume;
-
-  if (!themeMissing) {
-    theme.muted = !audio.music;
-    theme.volume = audio.volume * 0.55;
-    if (audio.music && theme.paused) {
-      const attempt = theme.play();
-      if (attempt && attempt.catch) attempt.catch(() => {});
-    }
-  }
 }
 
 // The first gesture is what makes any of it audible. Everything is already
@@ -734,7 +713,6 @@ audioRange.addEventListener("input", (e) => {
   showDial();
   audio.volume = Number(audioRange.value) / 100;
   heroVideo.volume = audio.volume;
-  theme.volume = audio.volume * 0.55;
 });
 // step is 25, so every change is a notch — one tick per detent
 audioRange.addEventListener("change", () => { showDial(); sfx.move(); });
