@@ -9,8 +9,31 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="style.css" />
+<style>
+  /* The quiz runs full-screen and deliberately has no site chrome. This is the
+     one exception: a way back out to the gym floor, tucked under the top
+     letterbox bar so it never collides with the lockup. */
+  .exit-to-gym {
+    position: fixed;
+    /* matches the .bar-top height in style.css */
+    top: calc(clamp(34px, 6vh, 62px) + 12px);
+    left: 22px;
+    z-index: 60;
+    font-family: var(--ui);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(242, 235, 216, 0.42);
+    text-decoration: none;
+    transition: color 0.25s var(--ease);
+  }
+  .exit-to-gym:hover { color: var(--bone); }
+  @media (max-width: 759px) { .exit-to-gym { left: 16px; font-size: 10px; } }
+</style>
 </head>
 <body>
+
 
 <!-- ============ HERO STAGE ============
      Two backdrops: a still for the attract screen (the Arkham "key art" beat)
@@ -69,7 +92,7 @@
   <!-- ============ ROSTER (opens from the menu) ============ -->
   <section id="screen-roster" class="screen">
     <p class="kicker">The Roster</p>
-    <h2 class="chapter-title">Four Fighters</h2>
+    <h2 class="chapter-title">Five Fighters</h2>
     <p class="lede">One of them is you. Pick a card to read them.</p>
 
     <div class="roster-view">
@@ -94,6 +117,11 @@
         <span class="record-name">The Sleeper</span>
         <span class="record-el">Assassin</span>
       </button>
+      <button class="record locked" data-archetype="cornerwoman">
+        <span class="record-art"><img alt="" /></span>
+        <span class="record-name">The Cornerwoman</span>
+        <span class="record-el">Support</span>
+      </button>
       </div>
 
       <aside class="roster-panel" id="roster-panel" aria-live="polite"></aside>
@@ -109,7 +137,7 @@
     <ol class="rules">
       <li>Nine questions. One ordinary day of fight camp, start to finish.</li>
       <li>No right answers. Don't think too much and answer fast, answer honest.</li>
-      <li>One of four fighters is you. Only yours gets unlocked.</li>
+      <li>One of five fighters is you. Only yours gets unlocked.</li>
       <li>You'll get a full read: how you train, your strengths, your weaknesses, and who you're compatible with.</li>
     </ol>
     <button class="btn" data-action="back-to-title">Back</button>
